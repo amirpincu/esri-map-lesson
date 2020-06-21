@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-city-weather-card-comp',
+  selector: 'city-weather-card-comp',
   templateUrl: './city-weather-card-comp.component.html',
   styleUrls: ['./city-weather-card-comp.component.scss']
 })

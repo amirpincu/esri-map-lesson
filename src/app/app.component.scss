@@ -1,0 +1,33 @@
+@import '../styles.scss';
+
+.weather-container {
+    margin: 1.25%;
+    top: 0; left: 0;
+    width: 60%;
+    display: flex; flex-wrap: wrap;
+    justify-content: center;
+
+    .input-container {
+        width: 100%;
+
+        form {
+            width: 100%;
+            margin-bottom: 1.5%;
+            text-align: center;
+
+            mat-form-field { margin-right: 1%; }
+            button { margin-left: 1%; }
+        }
+    }
+
+    .city-weather-container {
+        width: 20%;
+    }
+}
+
+.map-container {
+    margin: 1.25%;
+    top: 0; right: 0;
+    width: 40%; height: 100%;
+    position: fixed;
+}
