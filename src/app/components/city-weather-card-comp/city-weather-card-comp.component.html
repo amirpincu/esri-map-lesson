@@ -1,9 +1,32 @@
 <div class="container">
     <div class="weather-header">
         <label>{{data.cityName}}</label>
+        <button class="place-button" (click)="click()">O</button>
     </div>
-    <img class="weather-img" [src]="weatherImageSrc()">
-    <div class="weather-footer">
 
+    <div class="img-container">
+        <img class="weather-img" [src]="weatherImageSrc()">
+    </div>
+    
+    <div class="weather-footer">
+        <div class="min-temp-container">
+            <label class="min-label">Min Temp.:</label>
+            <label class="temp-label">{{data.minTemp}}°</label>
+        </div>
+        <div class="max-temp-container">
+            <label class="max-label">Max Temp.:</label>
+            <label class="temp-label">{{data.maxTemp}}°</label>
+        </div>
+    </div>
+
+    <div class="coord-footer">
+        <div class="lat-container">
+            <label class="lat-label">Latiture:</label>
+            <label class="lat-coord-label">{{data.lat}}°</label>
+        </div>
+        <div class="long-container">
+            <label class="long-label">Longitude:</label>
+            <label class="long-coord-label">{{data.long}}°</label>
+        </div>
     </div>
 </div>

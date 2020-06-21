@@ -36,11 +36,11 @@ export class AppComponent implements OnInit, OnDestroy {
             temp: res['main']['temp'], 
             maxTemp: res['main']['temp_max'],
             minTemp: res['main']['temp_min'], 
-            weatherDesc: res['weather'][0]['icon']
+            weatherDesc: res['weather'][0]['icon'],
+            lat: res['coord']['lat'], long: res['coord']['lon']
           };
   
           this.AddCityToList(newCity);
-          alert(`${cityName} added succesfully`);
         },
   
         // An Error
@@ -74,5 +74,9 @@ export class AppComponent implements OnInit, OnDestroy {
         }
       );
     }
+  }
+
+  public showPlace(coord: Array<number>): void {
+    console.log(coord);
   }
 }

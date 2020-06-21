@@ -7,23 +7,92 @@
     display: flex; flex-wrap: wrap;
 
     .weather-header {
-        background-color: #AAA;
         display: flex; width: 100%;
+        flex-wrap: wrap; background-color: #BBB;
         
         label {
-            width: 100%;
+            width: 80%;
             text-align: center;
             padding: 2%;
             font-weight: bolder;
         }
+
+        .place-button {
+            width: 20%;
+            border: 0; outline: none;
+            background: none;
+
+            &:active {
+                background-color: rgba( 0, 0, 0, 0.25 );
+            }
+        }
     }
 
-    .weather-img {
+    .img-container {
         width: 100%;
+        background-color: #BBB;
+        align-content: center;
+
+        .weather-img {
+            display: block;
+            margin: auto;
+            width: 98%;
+        }
     }
 
     .weather-footer {
-        width: 100%;
+        width: 100%; background-color: #BBB;
         display: flex; flex-wrap: wrap;
+        padding: 2.5% 0 0 0;
+
+        .min-temp-container {
+            width: 50%; display: flex; flex-wrap: wrap;
+            .min-label {
+                text-align: center;
+                font-weight: bolder; width: 100%;
+                color: rgb(73, 110, 139);
+            }
+            .temp-label {
+                text-align: center; width: 100%;
+            }
+        }
+
+        .max-temp-container {
+            width: 50%; display: flex; flex-wrap: wrap;
+            .max-label {
+                text-align: center;
+                font-weight: bolder; width: 100%;
+                color: rgb(167, 84, 58);
+            }
+            .temp-label {
+                text-align: center; width: 100%;
+            }
+        }
+    }
+
+    .coord-footer {
+        width: 100%; background-color: #BBB;
+        display: flex; flex-wrap: wrap;
+        padding: 2.5%;
+
+        .lat-container {
+            width: 50%; display: flex; flex-wrap: wrap;
+            .lat-label {
+                font-weight: bolder; text-align: center; width: 100%;
+            }
+            .lat-coord-label {
+                text-align: center; width: 100%;
+            }
+        }
+
+        .long-container {
+            width: 50%; display: flex; flex-wrap: wrap;
+            .long-label {
+                font-weight: bolder; text-align: center; width: 100%;
+            }
+            .long-coord-label {
+                text-align: center; width: 100%;
+            }
+        }
     }
 }

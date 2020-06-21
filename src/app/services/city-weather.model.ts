@@ -4,4 +4,5 @@ export class CityWeatherData {
     maxTemp: number;
     minTemp: number;
     weatherDesc: string;
+    lat: number; long: number;
 }

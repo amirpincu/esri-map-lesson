@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { CityWeatherData } from 'src/app/services/city-weather.model';
 
 @Component({
@@ -7,8 +7,8 @@ import { CityWeatherData } from 'src/app/services/city-weather.model';
   styleUrls: ['./city-weather-card-comp.component.scss']
 })
 export class CityWeatherCardCompComponent implements OnInit, OnDestroy {
-  @Input()
-  data: CityWeatherData = { cityName: `City not specified`, temp: 0, maxTemp: 1, minTemp: -1, weatherDesc: '01d'};
+  @Input() data: CityWeatherData = { cityName: `City not specified`, temp: 0, maxTemp: 1, minTemp: -1, weatherDesc: '01d', lat: 0.000, long: 0.000 };
+  @Output() placeMapClick: EventEmitter<Array<number>> = new EventEmitter<Array<number>>();
 
   public weatherImageSrc(): string {
     const url: string = `assets/weather-pics/${this.data.weatherDesc}.png`;
@@ -23,5 +23,9 @@ export class CityWeatherCardCompComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
 
+  }
+
+  click() {
+    this.placeMapClick.emit([this.data.lat, this.data.long]);
   }
 }
