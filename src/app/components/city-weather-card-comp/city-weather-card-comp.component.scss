@@ -1,0 +1,29 @@
+* {
+    box-sizing: border-box;
+}
+
+.container {
+    width: 100%; padding: 0.75%;
+    display: flex; flex-wrap: wrap;
+
+    .weather-header {
+        background-color: #AAA;
+        display: flex; width: 100%;
+        
+        label {
+            width: 100%;
+            text-align: center;
+            padding: 2%;
+            font-weight: bolder;
+        }
+    }
+
+    .weather-img {
+        width: 100%;
+    }
+
+    .weather-footer {
+        width: 100%;
+        display: flex; flex-wrap: wrap;
+    }
+}

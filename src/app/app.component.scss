@@ -1,7 +1,11 @@
 @import '../styles.scss';
 
+* {
+    box-sizing: border-box;;
+}
+
 .weather-container {
-    margin: 1.25%;
+    margin: 1.25% 0 0 0;
     top: 0; left: 0;
     width: 60%;
     display: flex; flex-wrap: wrap;
@@ -21,12 +25,17 @@
     }
 
     .city-weather-container {
-        width: 20%;
+        display: flex; flex-wrap: wrap;
+
+        .weather-card {
+            display: block;
+            width: 20%;
+        }
     }
 }
 
 .map-container {
-    margin: 1.25%;
+    padding: 1.25%;
     top: 0; right: 0;
     width: 40%; height: 100%;
     position: fixed;

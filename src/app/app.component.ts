@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { WeatherServService, WeatherAPIResponseCod } from './services/weather-serv.service';
-import { CityWeatherData } from './models/city-weather.model';
+import { CityWeatherData } from './services/city-weather.model';
 
 @Component({
   selector: 'app-root',

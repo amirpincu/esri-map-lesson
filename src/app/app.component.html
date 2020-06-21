@@ -19,7 +19,16 @@
   </div>
 
   <div class="city-weather-container">
-    <city-weather-card-comp>
+    <city-weather-card-comp class="weather-card"></city-weather-card-comp>
+    <city-weather-card-comp class="weather-card"></city-weather-card-comp>
+    <city-weather-card-comp class="weather-card"></city-weather-card-comp>
+    <city-weather-card-comp class="weather-card"></city-weather-card-comp>
+    <city-weather-card-comp class="weather-card"></city-weather-card-comp>
+    <city-weather-card-comp class="weather-card"></city-weather-card-comp>
+    <city-weather-card-comp class="weather-card"></city-weather-card-comp>
+    <city-weather-card-comp class="weather-card"></city-weather-card-comp>
+    <city-weather-card-comp class="weather-card"></city-weather-card-comp>
+    <city-weather-card-comp class="weather-card" *ngFor="let city of cities;" [data]="city">
     </city-weather-card-comp>
   </div>
 
