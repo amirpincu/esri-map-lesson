@@ -19,20 +19,17 @@
   </div>
 
   <div class="city-weather-container">
-    <city-weather-card-comp class="weather-card"></city-weather-card-comp> <city-weather-card-comp class="weather-card"></city-weather-card-comp>
-    <city-weather-card-comp class="weather-card"></city-weather-card-comp> <city-weather-card-comp class="weather-card"></city-weather-card-comp>
-    <city-weather-card-comp class="weather-card"></city-weather-card-comp> <city-weather-card-comp class="weather-card"></city-weather-card-comp>
+   
     <city-weather-card-comp class="weather-card" 
       *ngFor="let city of cities;" 
       [data]="city"
       (placeMapClick)="showPlace($event)"
     >
     </city-weather-card-comp>
+    
   </div>
 
 </div>
 
 <!-- Map -->
-<div class="map-container">
-  Hi
-</div>
+<div class="map-container" #mapViewNode></div>

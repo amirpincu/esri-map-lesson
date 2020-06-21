@@ -1,7 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { WeatherServService, WeatherAPIResponseCod } from './services/weather-serv.service';
 import { CityWeatherData } from './services/city-weather.model';
+
+import { loadModules } from 'esri-loader';
 
 @Component({
   selector: 'app-root',
@@ -12,11 +14,68 @@ export class AppComponent implements OnInit, OnDestroy {
   title = 'weather-map-proj'; WeatherAPIResponseCod = WeatherAPIResponseCod;
   form: FormGroup = new FormGroup({ 'city': new FormControl( '', [ Validators.required ]) });
 
+  @ViewChild('mapViewNode') mapViewEl: ElementRef;
+
   public cities: CityWeatherData[] = [];
+  public map: any; mapView: any;
 
   public constructor(private weatherService: WeatherServService) {}
-  public ngOnInit() { }
+  public ngOnInit() {
+    loadModules( 
+      ['esri/Map', 'esri/views/MapView'],
+     ).then(
+      ([EsriMap, EsriMapView]) => {
+        // Setting Map and view
+        const map = new EsriMap({
+          basemap: 'streets'
+        });
+        this.map = map;
+
+        const mapView = new EsriMapView({
+          container: this.mapViewEl.nativeElement,
+          center: [32.08, 34.8],
+          zoom: 10,
+          map: this.map
+        });
+        this.mapView = mapView;
+
+        console.log(this.map);
+        console.log(this.mapView);
+
+        this.addWidgets();
+    })
+    .catch( err => {
+      console.error(err);
+    });
+  }
   public ngOnDestroy() { }
+
+  private addWidgets() {
+    // Widget 1- Coord Shower
+    var coordsWidget = document.createElement("div");
+    coordsWidget.id = "coordsWidget";
+    coordsWidget.className = "esri-widget esri-component";
+    coordsWidget.style.padding = "7px 15px 5px";
+
+    this.mapView.ui.add(coordsWidget, "bottom-right");
+
+    //*** ADD ***//
+    function showCoordinates(pt) {
+      var coords = "Lat/Lon " + pt.latitude.toFixed(6) + " " 
+        + pt.longitude.toFixed(6) + " | Scale 1:" 
+        + Math.round(this.mapView.scale * 1) / 1 
+        + " | Zoom " + this.mapView.zoom;
+      coordsWidget.innerHTML = coords;
+    }
+
+    this.mapView.watch("stationary", function(isStationary) {
+      showCoordinates(this.mapView.center);
+    });
+
+    this.mapView.on("pointer-move", function(evt) {
+      showCoordinates(this.mapView.toMap({ x: evt.x, y: evt.y }));
+    });
+  }
 
   private AddCityToList( newCity: CityWeatherData ) : void {
     const existingCityIndex = this.cities.findIndex(currentCity => ( currentCity.cityName == newCity.cityName ));
@@ -77,6 +136,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   public showPlace(coord: Array<number>): void {
+    this.mapView.
     console.log(coord);
   }
 }

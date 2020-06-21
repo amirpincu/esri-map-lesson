@@ -5,10 +5,11 @@
 .container {
     width: 100%; padding: 0.75%;
     display: flex; flex-wrap: wrap;
+    background-color: #DDD;
 
     .weather-header {
         display: flex; width: 100%;
-        flex-wrap: wrap; background-color: #BBB;
+        flex-wrap: wrap;
         
         label {
             width: 80%;
@@ -30,7 +31,6 @@
 
     .img-container {
         width: 100%;
-        background-color: #BBB;
         align-content: center;
 
         .weather-img {
@@ -41,7 +41,7 @@
     }
 
     .weather-footer {
-        width: 100%; background-color: #BBB;
+        width: 100%;
         display: flex; flex-wrap: wrap;
         padding: 2.5% 0 0 0;
 
@@ -71,7 +71,7 @@
     }
 
     .coord-footer {
-        width: 100%; background-color: #BBB;
+        width: 100%;
         display: flex; flex-wrap: wrap;
         padding: 2.5%;
 

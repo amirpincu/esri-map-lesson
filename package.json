@@ -21,6 +21,8 @@
     "@angular/platform-browser": "~9.1.4",
     "@angular/platform-browser-dynamic": "~9.1.4",
     "@angular/router": "~9.1.4",
+    "angular-esri-map": "^2.0.5",
+    "esri-loader": "^2.14.0",
     "rxjs": "~6.5.4",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2"
@@ -30,6 +32,7 @@
     "@angular/cli": "^9.1.9",
     "@angular/compiler-cli": "~9.1.4",
     "@angular/language-service": "~9.1.4",
+    "@types/arcgis-js-api": "^4.15.0",
     "@types/jasmine": "~3.5.0",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^12.11.1",
