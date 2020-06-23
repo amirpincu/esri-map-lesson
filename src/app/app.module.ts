@@ -28,8 +28,7 @@ import { TextEditDialogCompComponent } from './components/text-edit-dialog-comp/
   imports: [
     CommonModule, RouterModule,
 
-    BrowserModule, BrowserAnimationsModule,
-    AppRoutingModule,
+    BrowserModule, BrowserAnimationsModule, AppRoutingModule,
     MatInputModule, MatButtonModule, MatCardModule,
     MatFormFieldModule, MatSlideToggleModule, HttpClientModule,
     ReactiveFormsModule, FormsModule

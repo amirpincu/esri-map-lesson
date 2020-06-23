@@ -3,7 +3,9 @@ import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angula
 import { WeatherServService, WeatherAPIResponseCod } from './services/weather-serv.service';
 import { CityWeatherData } from './services/city-weather.model';
 
+import esri = __esri;
 import { loadModules } from 'esri-loader';
+import { registerLocaleData } from '@angular/common';
 
 @Component({
   selector: 'app-root',
@@ -17,17 +19,19 @@ export class AppComponent implements OnInit, OnDestroy {
   @ViewChild('mapViewNode') mapViewEl: ElementRef;
 
   public cities: CityWeatherData[] = [];
-  public map: any; mapView: any;
+  public map: esri.Map; mapView: esri.MapView;
 
-  public constructor(private weatherService: WeatherServService) {}
+  public constructor(private weatherService: WeatherServService) { }
+
   public ngOnInit() {
     loadModules( 
-      ['esri/Map', 'esri/views/MapView'],
+      [ 'esri/Map', 'esri/views/MapView', 'esri/geometry/Point' ]
      ).then(
       ([EsriMap, EsriMapView]) => {
+        
         // Setting Map and view
         const map = new EsriMap({
-          basemap: 'streets'
+          basemap: 'satellite'
         });
         this.map = map;
 
@@ -39,50 +43,93 @@ export class AppComponent implements OnInit, OnDestroy {
         });
         this.mapView = mapView;
 
-        console.log(this.map);
-        console.log(this.mapView);
-
-        this.addWidgets();
+        this.addWidgets(mapView);
     })
     .catch( err => {
       console.error(err);
     });
   }
+
   public ngOnDestroy() { }
 
-  private addWidgets() {
+  private addWidgets(mapView: esri.MapView) {
+    /* {
+      // Widget 1- Coord Shower
+      var coordsWidget = document.createElement("div");
+      coordsWidget.id = "coordsWidget";
+      coordsWidget.className = "esri-widget esri-component";
+      coordsWidget.style.padding = "7px 15px 5px";
+
+      mapView.ui.add(coordsWidget, "bottom-left");
+
+      function showCoordinates(pt) {
+        var coords = "Lat/Lon " + pt.latitude.toFixed(6) + " " 
+          + pt.longitude.toFixed(6) + " | Scale 1:" 
+          + Math.round(mapView.scale * 1) / 1 
+          + " | Zoom " + mapView.zoom;
+        coordsWidget.innerHTML = coords;
+      }
+
+      mapView.watch("stationary", function(isStationary) {
+        showCoordinates(mapView.center);
+      });
+
+      mapView.on("pointer-move", function(evt) {
+        showCoordinates(mapView.toMap({ x: evt.x, y: evt.y }));
+      });
+    } */
+
     // Widget 1- Coord Shower
-    var coordsWidget = document.createElement("div");
-    coordsWidget.id = "coordsWidget";
-    coordsWidget.className = "esri-widget esri-component";
-    coordsWidget.style.padding = "7px 15px 5px";
+    {
+      let coordsWidget = document.createElement("div");
+      coordsWidget.id = "coordsWidget";
+      coordsWidget.className = "esri-widget esri-component";
+      coordsWidget.style.padding = "7px 15px 5px";
 
-    this.mapView.ui.add(coordsWidget, "bottom-right");
+      mapView.ui.add(coordsWidget, "bottom-left");
 
-    //*** ADD ***//
-    function showCoordinates(pt) {
-      var coords = "Lat/Lon " + pt.latitude.toFixed(6) + " " 
-        + pt.longitude.toFixed(6) + " | Scale 1:" 
-        + Math.round(this.mapView.scale * 1) / 1 
-        + " | Zoom " + this.mapView.zoom;
-      coordsWidget.innerHTML = coords;
+      //*** ADD ***//
+      function showCoordinates(pt) {
+        var coords = "Latitude : " + pt.latitude.toFixed(5) + " | Longitude : " + pt.longitude.toFixed(5) 
+        coordsWidget.innerHTML = coords;
+      }
+
+      mapView.watch("stationary", function(isStationary) {
+        showCoordinates(mapView.center);
+      });
+
+      mapView.on("pointer-move", function(evt) {
+        showCoordinates(mapView.toMap({ x: evt.x, y: evt.y }));
+      });
     }
 
-    this.mapView.watch("stationary", function(isStationary) {
-      showCoordinates(this.mapView.center);
-    });
+    // Widget 2- Zoom and Scale Shower
+    {
+      var zoomScaleWidget = document.createElement("div");
+      zoomScaleWidget.id = "scaleZoomWidget";
+      zoomScaleWidget.className = "esri-widget esri-component";
+      zoomScaleWidget.style.padding = "7px 15px 5px";
 
-    this.mapView.on("pointer-move", function(evt) {
-      showCoordinates(this.mapView.toMap({ x: evt.x, y: evt.y }));
-    });
+      mapView.ui.add(zoomScaleWidget, "top-left");
+
+      function showScaleZoom(pt) {
+        var coords = "Zoom: " + mapView.zoom + "  -  This is a scale of  1:" + Math.round(mapView.scale * 1) / 1;
+        zoomScaleWidget.innerHTML = coords;
+      }
+
+      mapView.watch("stationary", function(isStationary) {
+        showScaleZoom(mapView.center);
+      });
+    }
   }
 
   private AddCityToList( newCity: CityWeatherData ) : void {
     const existingCityIndex = this.cities.findIndex(currentCity => ( currentCity.cityName == newCity.cityName ));
     (existingCityIndex == -1) ? this.cities.push(newCity) : this.cities[existingCityIndex] = newCity;
+    this.showPlace( {'lat': newCity.lat, 'long': newCity.long} );
   }
 
-  public searchCity() {
+  public searchCity(): void {
     if (this.form.valid) {
       const cityName: string = this.form.controls['city'].value;
 
@@ -135,8 +182,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   }
 
-  public showPlace(coord: Array<number>): void {
-    this.mapView.
-    console.log(coord);
+  public showPlace(coord: object): void {
+    this.mapView.goTo([coord['long'], coord['lat']])
   }
 }
