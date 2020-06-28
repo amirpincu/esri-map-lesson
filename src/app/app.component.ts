@@ -5,6 +5,7 @@ import { CityWeatherData } from './services/city-weather.model';
 
 import esri = __esri;
 import { loadModules, loadScript } from 'esri-loader';
+import { Point } from 'esri/geometry';
 
 @Component({
   selector: 'app-root',
@@ -24,19 +25,35 @@ export class AppComponent implements OnInit, OnDestroy {
 
   public ngOnInit() {
     loadModules( 
-      [ 'esri/Map', 'esri/views/MapView', 'esri/layers/Layer', 'esri/layers/GraphicsLayer', 'esri/widgets/LayerList' ]
+      [ "esri/Map", 
+        "esri/views/MapView", 
+        "esri/layers/Layer", 
+        "esri/layers/GraphicsLayer", 
+        "esri/layers/FeatureLayer",
+        "esri/Graphic", 
+        "esri/geometry/Point", 
+        "esri/geometry/Polyline",
+        "esri/symbols/TextSymbol",
+      
+        "esri/widgets/Search",
+        "esri/widgets/Compass"]
      ).then(
-      ([EsriMap, EsriMapView, GraphicsLayer, LayerList]) => {
+      ([EsriMap, EsriMapView, 
+        Layer, GraphicsLayer, FeatureLayer, 
+        Graphic, Point, Polyline, TextSymbol, 
+        SearchWidget, Compass
+      ]) => {
         
         // Setting Map and view
         const map = new EsriMap({
-          basemap: 'streets'
+          // basemap: 'streets'
+          basemap: 'hybrid'
         });
         this.map = map;
 
         const mapView = new EsriMapView({
           container: this.mapViewEl.nativeElement,
-          center: [32.08, 34.8],
+          center: [31.80772, 31.65674],
           zoom: 10,
           map: this.map
         });
@@ -44,21 +61,76 @@ export class AppComponent implements OnInit, OnDestroy {
 
         // Widgets
         this.addCustomWidgets(mapView);
-        // {
-        //   // Custom
-
-        //   // Built-in
-        //   let layerList = new LayerList({
-        //     view: mapView
-        //   });
-        //   mapView.ui.add(layerList, {
-        //     position: "top-left"
-        //   });
-        // }
+        mapView.ui.add(
+          new SearchWidget({ view: mapView }),
+          { position: "top-right" }
+        );
+        mapView.ui.add(
+          new Compass({ view: mapView }),
+          { position: "top-right" }
+        );
 
         // Layers
-        let graphicsLayer = new GraphicsLayer({ 'id': 'graphicsLayer', 'graphics': [] });
-        map.add(graphicsLayer);
+        const polyline = {
+          type: "polyline",  // autocasts as new Polyline()
+          paths: [
+            [31.80772, 31.65674],
+            [31.99772, 31.85674],
+            [31.40772, 31.05674]
+          ]
+        };
+        const polylineSymbol = {
+          type: "simple-line",  // autocasts as SimpleLineSymbol()
+          color: [255, 0, 0],
+          width: 2
+        };
+        const polylineAtt = {
+          Name: "Keystone Pipeline",
+          Owner: "TransCanada"
+        };
+        const polylineGraphic = new Graphic({
+          geometry: polyline,
+          symbol: polylineSymbol,
+          attributes: polylineAtt
+        });
+        console.log(polylineGraphic);
+
+        // Label
+        let textSymbol = {
+          type: "text", // autocasts as new TextSymbol()
+          angle: 90,
+          color: "green",
+          font: {
+            // autocast as new Font()
+            family: "Ariel",
+            size: 12
+          },
+          haloColor: "black",
+          haloSize: 1,
+          horizontalAlignment: "justify",
+          verticalAlignment: "bottom"
+        };
+
+        // Layers
+        const graphics = [ new Point([31.80772, 31.65674]) ]
+        const gl = new GraphicsLayer( { 'id': 'graphicsLayer', 'graphics': [polylineGraphic] } )
+        const fl = new FeatureLayer({ 
+          source: [ polylineGraphic ],
+          fields: [{
+            name: "ObjectID",
+            alias: "ObjectID",
+            type: "oid"
+          }, {
+            name: "place",
+            alias: "Place",
+            type: "string"
+          }],
+          objectIdField: "ObjectID",
+          geometryType: "polyline"
+        });
+
+        // map.layers.add( gl );
+        map.layers.add( fl );
     })
     .catch( err => {
       console.error(err);
@@ -92,6 +164,26 @@ export class AppComponent implements OnInit, OnDestroy {
       });
     }
 
+    // Widget 3- Rotation Display
+    {
+      var rotationWidget = document.createElement("div");
+      rotationWidget.id = "scaleZoomWidget";
+      rotationWidget.className = "esri-widget esri-component";
+      rotationWidget.style.padding = "7px 15px 5px";
+
+      mapView.ui.add(rotationWidget, "bottom-right");
+
+      //*** ADD ***//
+      function showScaleZoom(pt) {
+        const coords = `Rotation: ${(360 - Math.round(mapView.rotation)) % 360}°  (↻)`;
+        rotationWidget.innerHTML = coords;
+      }
+
+      mapView.watch("stationary", function(isStationary) {
+        showScaleZoom(mapView.center);
+      });
+    }
+
     // Widget 2- Zoom and Scale Display
     {
       var zoomScaleWidget = document.createElement("div");
@@ -99,7 +191,7 @@ export class AppComponent implements OnInit, OnDestroy {
       zoomScaleWidget.className = "esri-widget esri-component";
       zoomScaleWidget.style.padding = "7px 15px 5px";
 
-      mapView.ui.add(zoomScaleWidget, "top-right");
+      mapView.ui.add(zoomScaleWidget, "bottom-right");
 
       //*** ADD ***//
       function showScaleZoom(pt) {
@@ -112,25 +204,6 @@ export class AppComponent implements OnInit, OnDestroy {
       });
     }
 
-    // Widget 3- Rotation Display
-    {
-      var rotationWidget = document.createElement("div");
-      rotationWidget.id = "scaleZoomWidget";
-      rotationWidget.className = "esri-widget esri-component";
-      rotationWidget.style.padding = "7px 15px 5px";
-
-      mapView.ui.add(rotationWidget, "top-right");
-
-      //*** ADD ***//
-      function showScaleZoom(pt) {
-        const coords = `Rotation: ${(360 - Math.round(mapView.rotation)) % 360}°  (↻)`;
-        rotationWidget.innerHTML = coords;
-      }
-
-      mapView.watch("stationary", function(isStationary) {
-        showScaleZoom(mapView.center);
-      });
-    }
   }
 
   private AddCityToList( newCity: CityWeatherData ) : void {
