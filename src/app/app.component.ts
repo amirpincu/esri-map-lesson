@@ -32,7 +32,6 @@ export class AppComponent implements OnInit, OnDestroy {
         "esri/layers/FeatureLayer",
         "esri/Graphic", 
         "esri/geometry/Point", 
-        "esri/geometry/Multipoint", 
         "esri/geometry/Polyline",
         "esri/symbols/TextSymbol",
       
@@ -41,7 +40,7 @@ export class AppComponent implements OnInit, OnDestroy {
      ).then(
       ([EsriMap, EsriMapView, 
         Layer, GraphicsLayer, FeatureLayer, 
-        Graphic, Point, Multipoint, Polyline, TextSymbol, 
+        Graphic, Point, Polyline, TextSymbol, 
         SearchWidget, Compass
       ]) => {
         
@@ -122,11 +121,11 @@ export class AppComponent implements OnInit, OnDestroy {
         };
 
         // Layers
-        const graphics = new Multipoint( [ 
+        const graphics = new esri.Multipoint [ 
           new Point([31.80772, 31.65674]),
           new Point([31.60772, 31.65674]),
           new Point([31.70772, 31.65674])
-        ] );
+        ];
 
         const gl = new GraphicsLayer( { 
           id: 'graphicsLayer', 
