@@ -32,6 +32,7 @@ export class AppComponent implements OnInit, OnDestroy {
         "esri/layers/FeatureLayer",
         "esri/Graphic", 
         "esri/geometry/Point", 
+        "esri/geometry/Multipoint", 
         "esri/geometry/Polyline",
         "esri/symbols/TextSymbol",
       
@@ -40,7 +41,7 @@ export class AppComponent implements OnInit, OnDestroy {
      ).then(
       ([EsriMap, EsriMapView, 
         Layer, GraphicsLayer, FeatureLayer, 
-        Graphic, Point, Polyline, TextSymbol, 
+        Graphic, Point, Multipoint, Polyline, TextSymbol, 
         SearchWidget, Compass
       ]) => {
         
@@ -91,45 +92,116 @@ export class AppComponent implements OnInit, OnDestroy {
         const polylineGraphic = new Graphic({
           geometry: polyline,
           symbol: polylineSymbol,
-          attributes: polylineAtt
+          // attributes: polylineAtt
         });
-        console.log(polylineGraphic);
 
         // Label
         let textSymbol = {
-          type: "text", // autocasts as new TextSymbol()
-          angle: 90,
-          color: "green",
-          font: {
-            // autocast as new Font()
-            family: "Ariel",
-            size: 12
-          },
+          type: "text",  // autocasts as new TextSymbol()
+          color: "white",
           haloColor: "black",
-          haloSize: 1,
-          horizontalAlignment: "justify",
-          verticalAlignment: "bottom"
+          haloSize: "1px",
+          text: "You are here",
+          xoffset: 3,
+          yoffset: 3,
+          font: {  // autocasts as new Font()
+            size: 12,
+            family: "Josefin Slab",
+            weight: "bold"
+          }
+        };
+        var lineSymbol = {
+          type: "simple-line", // autocasts as SimpleLineSymbol()
+          color: [226, 119, 40],
+          width: 4
+        };
+        var lineAtt = {
+          Name: "Keystone Pipeline",
+          Owner: "TransCanada",
+          Length: "3,456 km"
         };
 
         // Layers
-        const graphics = [ new Point([31.80772, 31.65674]) ]
-        const gl = new GraphicsLayer( { 'id': 'graphicsLayer', 'graphics': [polylineGraphic] } )
+        const graphics = new Multipoint( [ 
+          new Point([31.80772, 31.65674]),
+          new Point([31.60772, 31.65674]),
+          new Point([31.70772, 31.65674])
+        ] );
+
+        const gl = new GraphicsLayer( { 
+          id: 'graphicsLayer', 
+          graphics: [graphics], 
+          symbol: lineSymbol,
+          attributes: lineAtt,
+          popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "{Name}",
+            content: [
+              {
+                type: "fields",
+                fieldInfos: [
+                  {
+                    fieldName: "Name"
+                  },
+                  {
+                    fieldName: "Owner"
+                  },
+                  {
+                    fieldName: "Length"
+                  }
+                ]
+              }
+            ]
+          }
+        } )
         const fl = new FeatureLayer({ 
-          source: [ polylineGraphic ],
-          fields: [{
-            name: "ObjectID",
-            alias: "ObjectID",
-            type: "oid"
-          }, {
-            name: "place",
-            alias: "Place",
-            type: "string"
-          }],
+          source: [ graphics ],
+          // fields: [{
+          //   name: "ObjectID",
+          //   alias: "ObjectID",
+          //   type: "oid"
+          // }, {
+          //   name: "place",
+          //   alias: "Place",
+          //   type: "string"
+          // }],
+          renderer: {
+            type: "simple",
+            symbol: textSymbol
+          },
           objectIdField: "ObjectID",
-          geometryType: "polyline"
+          geometryType: "multipoint"
         });
 
-        // map.layers.add( gl );
+        var g = new Graphic({
+          geometry: graphics,
+          symbol: lineSymbol,
+          attributes: lineAtt,
+          popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "{Name}",
+            content: [
+              {
+                type: "fields",
+                fieldInfos: [
+                  {
+                    fieldName: "Name"
+                  },
+                  {
+                    fieldName: "Owner"
+                  },
+                  {
+                    fieldName: "Length"
+                  }
+                ]
+              }
+            ]
+          }
+        });
+
+        mapView.graphics.add(g);
+
+        map.layers.add( gl );
         map.layers.add( fl );
     })
     .catch( err => {
