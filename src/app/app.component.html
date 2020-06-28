@@ -32,4 +32,8 @@
 </div>
 
 <!-- Map -->
-<div class="map-container" #mapViewNode></div>
+<div class="map-container">
+  <div class="map" #mapViewNode></div>
+  <!-- *ngIf="showTextEditor"  -->
+  <text-editor class="editor" cdkDrag cdkDragBoundary=".map-container"></text-editor>
+</div>

@@ -13,7 +13,7 @@ import { Point } from 'esri/geometry';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'weather-map-proj'; WeatherAPIResponseCod = WeatherAPIResponseCod;
+  title = 'weather-map-proj'; WeatherAPIResponseCod = WeatherAPIResponseCod; showTextEditor = false;
   form: FormGroup = new FormGroup({ 'city': new FormControl( '', [ Validators.required ]) });
 
   @ViewChild('mapViewNode') mapViewEl: ElementRef;
@@ -27,181 +27,62 @@ export class AppComponent implements OnInit, OnDestroy {
     loadModules( 
       [ "esri/Map", 
         "esri/views/MapView", 
-        "esri/layers/Layer", 
+
         "esri/layers/GraphicsLayer", 
-        "esri/layers/FeatureLayer",
         "esri/Graphic", 
         "esri/geometry/Point", 
-        "esri/geometry/Polyline",
-        "esri/symbols/TextSymbol",
       
         "esri/widgets/Search",
-        "esri/widgets/Compass"]
+        "esri/widgets/Compass" ]
      ).then(
-      ([EsriMap, EsriMapView, 
-        Layer, GraphicsLayer, FeatureLayer, 
-        Graphic, Point, Polyline, TextSymbol, 
-        SearchWidget, Compass
-      ]) => {
+      ( [
+        EsriMap, EsriMapView, 
+        GraphicsLayer, 
+        Graphic, Point,
+        Search, Compass
+      ] ) => {
         
         // Setting Map and view
         const map = new EsriMap({
           // basemap: 'streets'
           basemap: 'hybrid'
-        });
-        this.map = map;
+        }); this.map = map;
 
         const mapView = new EsriMapView({
           container: this.mapViewEl.nativeElement,
-          center: [31.80772, 31.65674],
+          center: [ 31.92893, 34.5224 ],
           zoom: 10,
-          map: this.map
-        });
-        this.mapView = mapView;
+          map: map
+        }); this.mapView = mapView;
 
         // Widgets
+        let compassWidget = new Compass( { view: mapView } );
+        let searchWidget = new Search( { view: mapView } );
+        mapView.ui.add( searchWidget, { position: "top-right", index: 1 } );
+        mapView.ui.add( compassWidget, { position: "top-right", index: 2 } );
         this.addCustomWidgets(mapView);
-        mapView.ui.add(
-          new SearchWidget({ view: mapView }),
-          { position: "top-right" }
-        );
-        mapView.ui.add(
-          new Compass({ view: mapView }),
-          { position: "top-right" }
-        );
 
         // Layers
-        const polyline = {
-          type: "polyline",  // autocasts as new Polyline()
-          paths: [
-            [31.80772, 31.65674],
-            [31.99772, 31.85674],
-            [31.40772, 31.05674]
-          ]
-        };
-        const polylineSymbol = {
-          type: "simple-line",  // autocasts as SimpleLineSymbol()
-          color: [255, 0, 0],
-          width: 2
-        };
-        const polylineAtt = {
-          Name: "Keystone Pipeline",
-          Owner: "TransCanada"
-        };
-        const polylineGraphic = new Graphic({
-          geometry: polyline,
-          symbol: polylineSymbol,
-          // attributes: polylineAtt
-        });
-
-        // Label
-        let textSymbol = {
-          type: "text",  // autocasts as new TextSymbol()
-          color: "white",
-          haloColor: "black",
-          haloSize: "1px",
-          text: "You are here",
-          xoffset: 3,
-          yoffset: 3,
-          font: {  // autocasts as new Font()
-            size: 12,
-            family: "Josefin Slab",
-            weight: "bold"
+        const p = new Point({ latitude: 31.94893, longitude: 34.5224 });
+        const textSymbol = {
+          type: "text", // autocasts as new TextSymbol()
+          color: "#FF0000",
+          text: "Yoyoyoyo", // esri-icon-map-pin
+          font: {
+            // autocasts as new Font()
+            size: 36,
+            family: "Comic Sans MS"
           }
         };
-        var lineSymbol = {
-          type: "simple-line", // autocasts as SimpleLineSymbol()
-          color: [226, 119, 40],
-          width: 4
-        };
-        var lineAtt = {
-          Name: "Keystone Pipeline",
-          Owner: "TransCanada",
-          Length: "3,456 km"
-        };
-
-        // Layers
-        const graphics = new esri.Multipoint [ 
-          new Point([31.80772, 31.65674]),
-          new Point([31.60772, 31.65674]),
-          new Point([31.70772, 31.65674])
-        ];
-
-        const gl = new GraphicsLayer( { 
-          id: 'graphicsLayer', 
-          graphics: [graphics], 
-          symbol: lineSymbol,
-          attributes: lineAtt,
-          popupTemplate: {
-            // autocasts as new PopupTemplate()
-            title: "{Name}",
-            content: [
-              {
-                type: "fields",
-                fieldInfos: [
-                  {
-                    fieldName: "Name"
-                  },
-                  {
-                    fieldName: "Owner"
-                  },
-                  {
-                    fieldName: "Length"
-                  }
-                ]
-              }
-            ]
-          }
-        } )
-        const fl = new FeatureLayer({ 
-          source: [ graphics ],
-          // fields: [{
-          //   name: "ObjectID",
-          //   alias: "ObjectID",
-          //   type: "oid"
-          // }, {
-          //   name: "place",
-          //   alias: "Place",
-          //   type: "string"
-          // }],
-          renderer: {
-            type: "simple",
-            symbol: textSymbol
-          },
-          objectIdField: "ObjectID",
-          geometryType: "multipoint"
+        const g = new Graphic({
+          geometry: p,
+          symbol: textSymbol
         });
 
-        var g = new Graphic({
-          geometry: graphics,
-          symbol: lineSymbol,
-          attributes: lineAtt,
-          popupTemplate: {
-            // autocasts as new PopupTemplate()
-            title: "{Name}",
-            content: [
-              {
-                type: "fields",
-                fieldInfos: [
-                  {
-                    fieldName: "Name"
-                  },
-                  {
-                    fieldName: "Owner"
-                  },
-                  {
-                    fieldName: "Length"
-                  }
-                ]
-              }
-            ]
-          }
+        const gl = new GraphicsLayer({
+          graphics: [ g ]
         });
-
-        mapView.graphics.add(g);
-
-        map.layers.add( gl );
-        map.layers.add( fl );
+        map.add(gl);
     })
     .catch( err => {
       console.error(err);

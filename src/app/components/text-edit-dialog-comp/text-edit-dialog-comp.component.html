@@ -1,1 +1,42 @@
-<p>text-edit-dialog-comp works!</p>
+<div class="container">
+    <div class="header" cdkDragHandle>
+        <div class="text">
+            Text Editor
+        </div>
+        <button class="button">
+            X
+        </button>
+    </div>
+    <form class="form-content" [formGroup]="form">
+        <div class="form-text-input">
+            <mat-form-field class="text-field">
+                <mat-label>Text</mat-label>
+                <mat-error>Please enter some text.</mat-error>
+                <input matInput formControlName="text">
+            </mat-form-field>
+        </div>
+        <div class="form-attributes-input">
+            <mat-form-field class="size-field">
+                <mat-label>Font Size</mat-label>
+                <mat-error>Please select.</mat-error>
+                <mat-select formControlName="size">
+                    <mat-option *ngFor="let size of sizesList;" [value]="size">{{size}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field class="family-field">
+                <mat-label>Font Famility</mat-label>
+                <mat-error>Please select.</mat-error>
+                <mat-select formControlName="font">
+                    <mat-option>Yo</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field class="color-field">
+                <mat-label>Color</mat-label>
+                <mat-error>Please select.</mat-error>
+                <mat-select formControlName="color">
+                    <mat-option *ngFor="let color of colorList | keyvalue" [value]="color.value">{{color.key}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </form>
+</div>
