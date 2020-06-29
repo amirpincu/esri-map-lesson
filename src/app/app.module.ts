@@ -16,6 +16,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { AppComponent } from './app.component';
 import { CityWeatherCardCompComponent } from './components/city-weather-card-comp/city-weather-card-comp.component';
@@ -30,7 +31,7 @@ import { TextEditDialogCompComponent } from './components/text-edit-dialog-comp/
   imports: [
     CommonModule, RouterModule,
 
-    BrowserModule, BrowserAnimationsModule, AppRoutingModule,
+    BrowserModule, BrowserAnimationsModule, AppRoutingModule, MatCheckboxModule,
     MatInputModule, MatSelectModule, MatButtonModule, MatCardModule,
     MatFormFieldModule, MatSlideToggleModule, HttpClientModule,
     ReactiveFormsModule, FormsModule, DragDropModule

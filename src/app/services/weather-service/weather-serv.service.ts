@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { WeatherConstants } from './constants.model';
-import { CityWeatherData } from './city-weather.model';
+import { WeatherConstants } from '../constants.model';
+import { CityWeatherData } from '../city-weather.model';
 
 export enum WeatherAPIResponseCod {
   valid = 200,

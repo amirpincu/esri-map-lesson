@@ -1,11 +1,13 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
-import { WeatherServService, WeatherAPIResponseCod } from './services/weather-serv.service';
+import { WeatherServService, WeatherAPIResponseCod } from './services/weather-service/weather-serv.service';
+import { TextEditDialogCompComponent as TextEditDialogComponent } from './components/text-edit-dialog-comp/text-edit-dialog-comp.component';
 import { CityWeatherData } from './services/city-weather.model';
+
 
 import esri = __esri;
 import { loadModules, loadScript } from 'esri-loader';
-import { Point } from 'esri/geometry';
+import { EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -13,13 +15,16 @@ import { Point } from 'esri/geometry';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'weather-map-proj'; WeatherAPIResponseCod = WeatherAPIResponseCod; showTextEditor = false;
+  title = 'weather-map-proj'; WeatherAPIResponseCod = WeatherAPIResponseCod;
+  
   form: FormGroup = new FormGroup({ 'city': new FormControl( '', [ Validators.required ]) });
+  showTextEditor = true;
 
-  @ViewChild('mapViewNode') mapViewEl: ElementRef;
+  cities: CityWeatherData[] = [];
+  map: esri.Map; mapView: esri.MapView;
 
-  public cities: CityWeatherData[] = [];
-  public map: esri.Map; mapView: esri.MapView;
+  @ViewChild('mapViewNode', {static: true} ) public mapViewEl: ElementRef;
+  @ViewChild('textEditor', {static: true} ) public textEditor: TextEditDialogComponent;
 
   public constructor(private weatherService: WeatherServService) { }
 
@@ -43,17 +48,18 @@ export class AppComponent implements OnInit, OnDestroy {
       ] ) => {
         
         // Setting Map and view
-        const map = new EsriMap({
+        let map = new EsriMap({
           // basemap: 'streets'
           basemap: 'hybrid'
         }); this.map = map;
 
-        const mapView = new EsriMapView({
+        let mapView = new EsriMapView({
           container: this.mapViewEl.nativeElement,
           center: [ 31.92893, 34.5224 ],
-          zoom: 10,
+          zoom: 7,
           map: map
         }); this.mapView = mapView;
+        this.mapView.on("click", this.addGraphic)
 
         // Widgets
         let compassWidget = new Compass( { view: mapView } );
@@ -67,11 +73,13 @@ export class AppComponent implements OnInit, OnDestroy {
         const textSymbol = {
           type: "text", // autocasts as new TextSymbol()
           color: "#FF0000",
-          text: "Yoyoyoyo", // esri-icon-map-pin
+          text: "Yoyoyoyo",
+          haloSize: 1,
+          haloColor: "#000",
           font: {
             // autocasts as new Font()
             size: 36,
-            family: "Comic Sans MS"
+            family: "arial"
           }
         };
         const g = new Graphic({
@@ -83,13 +91,25 @@ export class AppComponent implements OnInit, OnDestroy {
           graphics: [ g ]
         });
         map.add(gl);
+
     })
     .catch( err => {
       console.error(err);
     });
   }
 
+  public addGraphic(obj) {
+    try {
+      console.log("a");
+      this.textEditor?.emitSendSymbol();
+    } catch (e) { console.log("e") }
+  }
+
   public ngOnDestroy() { }
+
+  public addNewText(obj): void {
+    console.log(obj);
+  }
 
   private addCustomWidgets(mapView: esri.MapView) {
     // Widget 1- Coord Display
@@ -156,6 +176,10 @@ export class AppComponent implements OnInit, OnDestroy {
       });
     }
 
+  }
+
+  public hideEditor() {
+    this.showTextEditor = false;
   }
 
   private AddCityToList( newCity: CityWeatherData ) : void {
