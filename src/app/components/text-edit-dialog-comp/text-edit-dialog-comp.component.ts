@@ -8,36 +8,31 @@ import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angula
 })
 export class TextEditDialogCompComponent implements OnInit {
   @Output() sendSymbol: EventEmitter<object> = new EventEmitter<object>();
+  stylize: boolean = true;
 
   form: FormGroup = new FormGroup({ 
-    'text': new FormControl( '', [ Validators.required ]),
-    'size': new FormControl( 14, [ Validators.required ]),
+    'text': new FormControl( 'Sample', [ Validators.required ]),
+    'size': new FormControl( 72, [ Validators.required ]),
     'font': new FormControl( 'arial', [ Validators.required ]),
-    'color': new FormControl( '#222', [ Validators.required ]),
+    'color': new FormControl( '#eee', [ Validators.required ]),
   });
 
   sizesList = [ 
     6, 8, 12, 14, 18, 24, 36, 48, 72, 96
   ];
   fontsDictinoray = {
-    'Default': {
+    'Serif': {
       'arial': 'Arial',
-      'arial-unicode': 'Arial Unicode'
+      'josefin-slab': 'Josefin Slab',
+      'ubuntu': 'Ubuntu',
     },
     'Sans-Serif': {
+      'palatino-linotype': 'Palatino Linotype',
       'belleza': 'Belleza',
       'josefin-sans': 'Josefin Sans',
       'oswald': 'Oswald',
-      'ubuntu': 'Ubuntu',
-      'timmana': 'Timmana'
-    },
-    'Serif': {
-      'inkut-antiqua': 'Inkut Antiqua',
-      'josefin-slab': 'Josefin Slab',
-      'palatino-linotype': 'Palatino Linotype',
     },
     'Script': {
-      'amatic': 'Amatic',
       'coming-soon': 'Coming Soon',
       'homemade-apple': 'Homemade Apple',
       'just-another-hand': 'Just Another Hand',
@@ -51,7 +46,6 @@ export class TextEditDialogCompComponent implements OnInit {
       'pacifico': 'Pacifico',
       'rye': 'Rye',
       'syncopate': 'Syncopate',
-      'unifrafturcoof': 'Unifraftutcoof',
       'vast-shadow': 'Vast Shadow'
     }
   };
@@ -77,19 +71,29 @@ export class TextEditDialogCompComponent implements OnInit {
   ngOnInit(): void { }
 
   public emitSendSymbol(): void {
-    console.log("b");
     const controls = this.form.controls;
+
+    // Only show the bold and italic checkboxes for fonts that support them
+    if (Object.keys(this.fontsDictinoray.Serif).includes(controls['font'].value)) {
+      this.stylize = true;
+    }
+    else {
+      this.stylize = false;
+      this.isBold = false; this.isItalic = false;
+    }
+
+    // If everythings fine send the symbol
     if (this.form.valid) {
       const textSymbol: object = {
         type: 'text', // autocasts as new TextSymbol()
         color: controls['color'].value,
         text: controls['text'].value,
-        style: ( this.isItalic ? 'italic' : 'normal' ),
-        weight: ( this.isBold ? 'bolder' : 'normal' ),
         font: {
           // autocasts as new Font()
           size: controls['size'].value,
-          family: controls['font'].value
+          family: controls['font'].value,
+          style: ( this.isItalic ? 'italic' : 'normal' ),
+          weight: ( this.isBold ? 'bolder' : 'normal' )
         },
 
         haloSize: 1,

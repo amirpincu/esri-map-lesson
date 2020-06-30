@@ -5,7 +5,7 @@
             <mat-form-field class="text-field">
                 <mat-label>Text</mat-label>
                 <mat-error>Please enter some text.</mat-error>
-                <input matInput placeholder="Ex. 'Sample'" formControlName="text">
+                <input matInput placeholder="Ex. 'Sample'" formControlName="text" (input)="emitSendSymbol()">
             </mat-form-field>
         </div>
         <div class="form-attributes-input">
@@ -13,7 +13,7 @@
             <mat-form-field class="size-field">
                 <mat-label>Font Size</mat-label>
                 <mat-error>Please select.</mat-error>
-                <mat-select formControlName="size">
+                <mat-select formControlName="size" (selectionChange)="emitSendSymbol()">
                     <mat-option *ngFor="let size of sizesList;" [value]="size">{{size}}</mat-option>
                 </mat-select>
             </mat-form-field>
@@ -21,7 +21,7 @@
             <mat-form-field class="family-field">
                 <mat-label>Font Famility</mat-label>
                 <mat-error>Please select.</mat-error>
-                <mat-select formControlName="font">
+                <mat-select formControlName="font" (selectionChange)="emitSendSymbol()">
                     <mat-optgroup *ngFor="let fontCat of fontsDictinoray  | keyvalue" [label]="fontCat.key">
                         <mat-option *ngFor="let font of fontCat.value  | keyvalue" [value]="font.key">
                             {{font.value}}
@@ -33,7 +33,7 @@
             <mat-form-field class="color-field">
                 <mat-label>Color</mat-label>
                 <mat-error>Please select.</mat-error>
-                <mat-select formControlName="color">
+                <mat-select formControlName="color" (selectionChange)="emitSendSymbol()">
                     <mat-option 
                         *ngFor="let color of colorList | keyvalue" 
                         [value]="color.value"
@@ -43,12 +43,20 @@
                 </mat-select>
             </mat-form-field>
         </div>
-        <div class="form-style-input">
+        <div class="form-style-input" *ngIf="stylize">
             <div class="bold-field"> <!-- Text Bold -->
-                <mat-checkbox [(ngModel)]="isBold" [ngModelOptions]="{standalone: true}"><b>B</b></mat-checkbox>
+                <mat-checkbox 
+                    [(ngModel)]="isBold" 
+                    [ngModelOptions]="{standalone: true}" 
+                    (change)="emitSendSymbol()"
+                ><b>B</b></mat-checkbox>
             </div>
             <div class="italic-field"> <!-- Text Italic -->
-                <mat-checkbox [(ngModel)]="isItalic" [ngModelOptions]="{standalone: true}"><i>I</i></mat-checkbox>
+                <mat-checkbox
+                    [(ngModel)]="isItalic" 
+                    [ngModelOptions]="{standalone: true}" 
+                    (change)="emitSendSymbol()"
+                ><i>I</i></mat-checkbox>
             </div>
         </div>
     </form>

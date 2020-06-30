@@ -40,10 +40,10 @@
         <div class="text">
             Text Editor
         </div>
-        <button class="button" (click)="hideEditor()">
+        <button class="button" (click)="flipEditor()">
             X
         </button>
     </div>
-    <text-editor #textEditor (sendSymbol)="addNewText(obj)"></text-editor>
+    <text-editor (sendSymbol)="updateSymbol($event)"></text-editor>
   </div>
 </div>

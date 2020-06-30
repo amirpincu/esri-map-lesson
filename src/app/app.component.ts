@@ -8,6 +8,7 @@ import { CityWeatherData } from './services/city-weather.model';
 import esri = __esri;
 import { loadModules, loadScript } from 'esri-loader';
 import { EventEmitter } from '@angular/core';
+import { layer } from 'esri/views/3d/support/LayerPerformanceInfo';
 
 @Component({
   selector: 'app-root',
@@ -17,14 +18,26 @@ import { EventEmitter } from '@angular/core';
 export class AppComponent implements OnInit, OnDestroy {
   title = 'weather-map-proj'; WeatherAPIResponseCod = WeatherAPIResponseCod;
   
-  form: FormGroup = new FormGroup({ 'city': new FormControl( '', [ Validators.required ]) });
+  form: FormGroup = new FormGroup({ 'city': new FormControl( '', [ Validators.required, Validators.minLength(1) ]) });
+  keepTextSymbol: object = {
+    type: 'text', // autocasts as new TextSymbol()
+    color: '#eee',
+    text: 'Sample',
+    font: {
+      // autocasts as new Font()
+      size: 72,
+      family: 'arial'
+    },
+
+    haloSize: 1,
+    haloColor: 'rgba(0, 0, 0, 0.5)'
+  };
   showTextEditor = true;
 
   cities: CityWeatherData[] = [];
   map: esri.Map; mapView: esri.MapView;
 
   @ViewChild('mapViewNode', {static: true} ) public mapViewEl: ElementRef;
-  @ViewChild('textEditor', {static: true} ) public textEditor: TextEditDialogComponent;
 
   public constructor(private weatherService: WeatherServService) { }
 
@@ -59,38 +72,39 @@ export class AppComponent implements OnInit, OnDestroy {
           zoom: 7,
           map: map
         }); this.mapView = mapView;
-        this.mapView.on("click", this.addGraphic)
 
         // Widgets
         let compassWidget = new Compass( { view: mapView } );
         let searchWidget = new Search( { view: mapView } );
         mapView.ui.add( searchWidget, { position: "top-right", index: 1 } );
         mapView.ui.add( compassWidget, { position: "top-right", index: 2 } );
+        this.addCustomWidgets = this.addCustomWidgets.bind(this);
         this.addCustomWidgets(mapView);
 
         // Layers
-        const p = new Point({ latitude: 31.94893, longitude: 34.5224 });
-        const textSymbol = {
-          type: "text", // autocasts as new TextSymbol()
-          color: "#FF0000",
-          text: "Yoyoyoyo",
-          haloSize: 1,
-          haloColor: "#000",
-          font: {
-            // autocasts as new Font()
-            size: 36,
-            family: "arial"
-          }
-        };
-        const g = new Graphic({
-          geometry: p,
-          symbol: textSymbol
-        });
-
-        const gl = new GraphicsLayer({
+        const p = new Point({ latitude: 31.92893, longitude: 34.5224 });
+        const g = new Graphic( { geometry: p, symbol: this.keepTextSymbol } );
+        let gl = new GraphicsLayer({
+          id: 'graphic-layer',
           graphics: [ g ]
         });
         map.add(gl);
+
+        // Graphics
+        let f = function(obj) {
+          const p = new Point({ x: obj.x, y: obj.y });
+          console.log(obj);
+          const g = new Graphic({ geometry: new Point({ latitude: mapView.center.latitude, longitude: mapView.center.longitude }), symbol: this.keepTextSymbol });
+
+          const graphics = map.findLayerById('graphic-layer').graphics;
+          graphics.remove(graphics.items[0]);
+          graphics.add(g);
+
+          console.log(g.geometry.x); console.log(g.geometry.y);
+        };
+        f = f.bind(this);
+
+        this.mapView.on("click", f );
 
     })
     .catch( err => {
@@ -98,19 +112,15 @@ export class AppComponent implements OnInit, OnDestroy {
     });
   }
 
-  public addGraphic(obj) {
-    try {
-      console.log("a");
-      this.textEditor?.emitSendSymbol();
-    } catch (e) { console.log("e") }
-  }
-
   public ngOnDestroy() { }
 
+  public updateSymbol(evt) {
+    this.keepTextSymbol = evt;
+    this.map.findLayerById('graphic-layer')['graphics']['items'][0]['symbol'] = (evt);
+  }
   public addNewText(obj): void {
     console.log(obj);
   }
-
   private addCustomWidgets(mapView: esri.MapView) {
     // Widget 1- Coord Display
     {
@@ -123,7 +133,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
       //*** ADD ***//
       function showCoordinates(pt) {
-        const coords = `Latitude : ${pt.latitude.toFixed(5)}° | Longitude : ${pt.longitude.toFixed(5)}°` 
+        const coords = `Latitude : ${pt.latitude.toFixed(5)}° | Longitude : ${pt.longitude.toFixed(5)}°`;
         coordsWidget.innerHTML = coords;
       }
 
@@ -136,7 +146,7 @@ export class AppComponent implements OnInit, OnDestroy {
       });
     }
 
-    // Widget 3- Rotation Display
+    // Widget 2- Rotation Display
     {
       var rotationWidget = document.createElement("div");
       rotationWidget.id = "scaleZoomWidget";
@@ -156,7 +166,7 @@ export class AppComponent implements OnInit, OnDestroy {
       });
     }
 
-    // Widget 2- Zoom and Scale Display
+    // Widget 3- Zoom and Scale Display
     {
       var zoomScaleWidget = document.createElement("div");
       zoomScaleWidget.id = "scaleZoomWidget";
@@ -176,10 +186,21 @@ export class AppComponent implements OnInit, OnDestroy {
       });
     }
 
-  }
+    // Widget 2- Zoom and Scale Display
+    {
+      var textWidget = document.createElement("button");
+      textWidget.id = "textWidget";
+      textWidget.innerHTML = "Text Edit";
+      textWidget.className = "esri-widget esri-component";
+      textWidget.style.padding = "7px 15px 5px";
+      textWidget.onclick = this.flipEditor;
+      mapView.ui.add(textWidget, "top-right");
+    }
 
-  public hideEditor() {
-    this.showTextEditor = false;
+  }
+  public flipEditor() {
+    console.log("yo");
+    this.showTextEditor = !this.showTextEditor;
   }
 
   private AddCityToList( newCity: CityWeatherData ) : void {
