@@ -1,5 +1,7 @@
 <div class="container">
+    <!-- Form contains all input fields -->
     <form class="form-content" [formGroup]="form">
+        <!-- Text -->
         <div class="form-text-input">
             <!-- The text -->
             <mat-form-field class="text-field">
@@ -8,6 +10,7 @@
                 <input matInput placeholder="Ex. 'Sample'" formControlName="text" (input)="emitSendSymbol()">
             </mat-form-field>
         </div>
+        <!-- Coloring and Style -->
         <div class="form-attributes-input">
             <!-- Font Size -->
             <mat-form-field class="size-field">
@@ -43,6 +46,7 @@
                 </mat-select>
             </mat-form-field>
         </div>
+        <!-- Font Attributes -->
         <div class="form-style-input" *ngIf="stylize">
             <div class="bold-field"> <!-- Text Bold -->
                 <mat-checkbox 

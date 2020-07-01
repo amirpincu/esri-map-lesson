@@ -18,6 +18,7 @@
     </form>
   </div>
 
+  <!-- City Weather Cards -->
   <div class="city-weather-container">
    
     <city-weather-card-comp class="weather-card" 
@@ -33,17 +34,21 @@
 
 <!-- Map -->
 <div class="map-container">
+  <!-- Map -->
   <div class="map" #mapViewNode></div>
 
-    <div class="editor" cdkDrag cdkDragBoundary=".map-container" *ngIf="showTextEditor">
-      <div class="header" cdkDragHandle>
-        <div class="text">
-            Text Editor
-        </div>
-        <button class="button" (click)="hideEditor()">
-            X
-        </button>
+  <!-- Editor -->
+  <div class="editor" cdkDrag cdkDragBoundary=".map-container" *ngIf="showTextEditor">
+    <!-- The header with close button -->
+    <div class="header" cdkDragHandle>
+      <div class="text">
+          Text Editor
+      </div>
+      <button class="button" (click)="hideEditor()">
+          X
+      </button>
     </div>
+    <!-- The actual editor content -->
     <text-editor (sendSymbol)="updateSymbol($event)"></text-editor>
   </div>
 </div>

@@ -1,13 +1,16 @@
 <div class="container">
+    <!-- Header with city name -->
     <div class="weather-header">
         <label>{{data.cityName}}</label>
         <button class="place-button" (click)="click()">O</button>
     </div>
 
+    <!-- The image according to weather description -->
     <div class="img-container">
         <img class="weather-img" [src]="weatherImageSrc()">
     </div>
     
+    <!-- Temperature -->
     <div class="weather-footer">
         <div class="min-temp-container">
             <label class="min-label">Min Temp.:</label>
@@ -19,6 +22,7 @@
         </div>
     </div>
 
+    <!-- Coordinates -->
     <div class="coord-footer">
         <div class="lat-container">
             <label class="lat-label">Latiture:</label>
