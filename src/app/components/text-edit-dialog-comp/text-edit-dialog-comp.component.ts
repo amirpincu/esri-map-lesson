@@ -68,7 +68,7 @@ export class TextEditDialogCompComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void { this.emitSendSymbol(); }
 
   public emitSendSymbol(): void {
     const controls = this.form.controls;
@@ -96,6 +96,7 @@ export class TextEditDialogCompComponent implements OnInit {
           weight: ( this.isBold ? 'bolder' : 'normal' )
         },
 
+        yoffset: ( controls['size'].value * -0.5 ),
         haloSize: 1,
         haloColor: 'rgba(0, 0, 0, 0.5)'
       };

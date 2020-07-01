@@ -16,24 +16,30 @@ import { layer } from 'esri/views/3d/support/LayerPerformanceInfo';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'weather-map-proj'; WeatherAPIResponseCod = WeatherAPIResponseCod;
+  title = 'weather-map-proj';
   
-  form: FormGroup = new FormGroup({ 'city': new FormControl( '', [ Validators.required, Validators.minLength(1) ]) });
+  // VARIABLES REALATED TO THE MAP
+  // trying to get the symbol on load isnt possible so we keep a starting object
   keepTextSymbol: object = {
     type: 'text', // autocasts as new TextSymbol()
     color: '#eee',
-    text: 'Sample',
+    text: '',
     font: {
       // autocasts as new Font()
       size: 72,
       family: 'arial'
     },
 
+    yoffset: -36,
     haloSize: 1,
     haloColor: 'rgba(0, 0, 0, 0.5)'
   };
-  showTextEditor = true;
+  showTextEditor = false; // the variable deciding if the text editor shows.
+  currCord = [ 0.000, 0.000 ]; // the currdinates are kept because click does not return the correct ones.
 
+  // VARIABLES RELATED TO THE CITY WEATHER
+  WeatherAPIResponseCod = WeatherAPIResponseCod;
+  form: FormGroup = new FormGroup({ 'city': new FormControl( '', [ Validators.required, Validators.minLength(1) ]) });
   cities: CityWeatherData[] = [];
   map: esri.Map; mapView: esri.MapView;
 
@@ -43,13 +49,15 @@ export class AppComponent implements OnInit, OnDestroy {
 
   public ngOnInit() {
     loadModules( 
-      [ "esri/Map", 
+      [ 
+        // Map
+        "esri/Map", 
         "esri/views/MapView", 
-
+        // Layers
         "esri/layers/GraphicsLayer", 
         "esri/Graphic", 
         "esri/geometry/Point", 
-      
+        // Widgets
         "esri/widgets/Search",
         "esri/widgets/Compass" ]
      ).then(
@@ -78,11 +86,13 @@ export class AppComponent implements OnInit, OnDestroy {
         let searchWidget = new Search( { view: mapView } );
         mapView.ui.add( searchWidget, { position: "top-right", index: 1 } );
         mapView.ui.add( compassWidget, { position: "top-right", index: 2 } );
+        
+        // Custom widgets
         this.addCustomWidgets = this.addCustomWidgets.bind(this);
         this.addCustomWidgets(mapView);
 
-        // Layers
-        const p = new Point({ latitude: 31.92893, longitude: 34.5224 });
+        // The graphics layer
+        const p = this.mapView.center;
         const g = new Graphic( { geometry: p, symbol: this.keepTextSymbol } );
         let gl = new GraphicsLayer({
           id: 'graphic-layer',
@@ -90,22 +100,21 @@ export class AppComponent implements OnInit, OnDestroy {
         });
         map.add(gl);
 
-        // Graphics
+        // On click function
         let f = function(obj) {
-          const p = new Point({ x: obj.x, y: obj.y });
-          console.log(obj);
-          const g = new Graphic({ geometry: new Point({ latitude: mapView.center.latitude, longitude: mapView.center.longitude }), symbol: this.keepTextSymbol });
-
-          const graphics = map.findLayerById('graphic-layer').graphics;
-          graphics.remove(graphics.items[0]);
-          graphics.add(g);
-
-          console.log(g.geometry.x); console.log(g.geometry.y);
+          if (this.showEditor) { // Only if the editor is on screen
+            // Creating the new graphic
+            const p = new Point({ x: obj.x, y: obj.y });
+            const g = new Graphic({ geometry: new Point({ latitude: this.currCord[0], longitude: this.currCord[1] }), symbol: this.keepTextSymbol });
+  
+            // Replacing the existing graphic with a new one
+            const graphics = map.findLayerById('graphic-layer').graphics;
+            graphics.remove(graphics.items[0]);
+            graphics.add(g);
+          }
         };
         f = f.bind(this);
-
         this.mapView.on("click", f );
-
     })
     .catch( err => {
       console.error(err);
@@ -114,13 +123,14 @@ export class AppComponent implements OnInit, OnDestroy {
 
   public ngOnDestroy() { }
 
+  // Activates every time a new symbol is sent.
   public updateSymbol(evt) {
-    this.keepTextSymbol = evt;
+    // Keeping the symbol and replacing the existing one with it
+
+    this.keepTextSymbol = evt; // Needs to be kept for creating new graphics
     this.map.findLayerById('graphic-layer')['graphics']['items'][0]['symbol'] = (evt);
   }
-  public addNewText(obj): void {
-    console.log(obj);
-  }
+  // Adds custom widgets to the map view
   private addCustomWidgets(mapView: esri.MapView) {
     // Widget 1- Coord Display
     {
@@ -132,17 +142,21 @@ export class AppComponent implements OnInit, OnDestroy {
       mapView.ui.add(coordsWidget, "bottom-left");
 
       //*** ADD ***//
-      function showCoordinates(pt) {
+      let f = function showCoordinates(pt) {
         const coords = `Latitude : ${pt.latitude.toFixed(5)}° | Longitude : ${pt.longitude.toFixed(5)}°`;
+        this.setCoords = this.setCoords.bind(this);
+        this.setCoords( pt.latitude, pt.longitude );
         coordsWidget.innerHTML = coords;
       }
+      f = f.bind(this);
+
 
       mapView.watch("stationary", function(isStationary) {
-        showCoordinates(mapView.center);
+        f(mapView.center);
       });
 
       mapView.on("pointer-move", function(evt) {
-        showCoordinates(mapView.toMap({ x: evt.x, y: evt.y }));
+        f(mapView.toMap({ x: evt.x, y: evt.y }));
       });
     }
 
@@ -186,29 +200,34 @@ export class AppComponent implements OnInit, OnDestroy {
       });
     }
 
-    // Widget 2- Zoom and Scale Display
+    // Widget 4- Text Display
     {
       var textWidget = document.createElement("button");
       textWidget.id = "textWidget";
       textWidget.innerHTML = "Text Edit";
       textWidget.className = "esri-widget esri-component";
       textWidget.style.padding = "7px 15px 5px";
-      textWidget.onclick = this.flipEditor;
+      this.showEditor = this.showEditor.bind(this);
+      textWidget.onclick = this.showEditor;
       mapView.ui.add(textWidget, "top-right");
     }
 
   }
-  public flipEditor() {
-    console.log("yo");
-    this.showTextEditor = !this.showTextEditor;
-  }
 
+  // Both buttons the affect the text editor need to set the value to specific values so there's a need for both functions
+  public showEditor() { this.showTextEditor = true; }
+  public hideEditor() { this.showTextEditor = false; }
+
+  // Sets the kept coordinates object
+  public setCoords(lat: number, long: number) { this.currCord = [ lat, long ]; }
+
+
+  // Functions relating to the city weather
   private AddCityToList( newCity: CityWeatherData ) : void {
     const existingCityIndex = this.cities.findIndex(currentCity => ( currentCity.cityName == newCity.cityName ));
     (existingCityIndex == -1) ? this.cities.push(newCity) : this.cities[existingCityIndex] = newCity;
     this.showPlace( {'lat': newCity.lat, 'long': newCity.long} );
   }
-
   public searchCity(): void {
     if (this.form.valid) {
       const cityName: string = this.form.controls['city'].value;
@@ -261,7 +280,6 @@ export class AppComponent implements OnInit, OnDestroy {
       );
     }
   }
-
   public showPlace(coord: object): void {
     this.mapView.goTo([coord['long'], coord['lat']])
   }
