@@ -1,0 +1,19 @@
+<div class="comp-container">
+    <!-- Map -->
+    <div class="map" #mapViewNode></div>
+
+    <!-- Editor -->
+    <div class="editor" cdkDrag cdkDragBoundary=".map-container" *ngIf="showTextEditor">
+        <!-- The header with close button -->
+        <div class="header" cdkDragHandle>
+        <div class="text">
+            Text Editor
+        </div>
+        <button class="button" (click)="hideEditor()">
+            X
+        </button>
+        </div>
+        <!-- The actual editor content -->
+        <text-editor (sendSymbol$)="updateSymbol()"></text-editor>
+    </div>
+</div>

@@ -21,12 +21,14 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AppComponent } from './app.component';
 import { CityWeatherCardCompComponent } from './components/city-weather-card-comp/city-weather-card-comp.component';
 import { TextEditDialogCompComponent } from './components/text-edit-dialog-comp/text-edit-dialog-comp.component';
+import { MapCompComponent } from './components/map-comp/map-comp.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     CityWeatherCardCompComponent,
-    TextEditDialogCompComponent
+    TextEditDialogCompComponent,
+    MapCompComponent
   ],
   imports: [
     CommonModule, RouterModule,

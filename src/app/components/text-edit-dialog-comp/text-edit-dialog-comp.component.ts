@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import { MapStoreServiceService } from 'src/app/services/map-store-service/map-store-service.service';
 
 @Component({
   selector: 'text-editor',
@@ -7,15 +8,10 @@ import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angula
   styleUrls: ['./text-edit-dialog-comp.component.scss']
 })
 export class TextEditDialogCompComponent implements OnInit {
-  @Output() sendSymbol: EventEmitter<object> = new EventEmitter<object>();
+  @Output() sendSymbol$: EventEmitter<number> = new EventEmitter<number>();
   stylize: boolean = true;
 
-  form: FormGroup = new FormGroup({ 
-    'text': new FormControl( 'Sample', [ Validators.required ]),
-    'size': new FormControl( 72, [ Validators.required ]),
-    'font': new FormControl( 'arial', [ Validators.required ]),
-    'color': new FormControl( '#eee', [ Validators.required ]),
-  });
+  form: FormGroup;
 
   sizesList = [ 
     6, 8, 12, 14, 18, 24, 36, 48, 72, 96
@@ -66,9 +62,21 @@ export class TextEditDialogCompComponent implements OnInit {
   };
   isBold: boolean; isItalic: boolean;
 
-  constructor() { }
+  constructor(private mapStore: MapStoreServiceService) { 
+    const textSymbol = this.mapStore.getTextSymbol();
+    this.form = new FormGroup({ 
+      'text': new FormControl( textSymbol['text'], [ Validators.required ]),
+      'size': new FormControl( textSymbol['font']['size'], [ Validators.required ]),
+      'font': new FormControl( textSymbol['font']['family'], [ Validators.required ]),
+      'color': new FormControl( textSymbol['color'], [ Validators.required ]),
+    });
+    this.isBold = ('bolder' == textSymbol['font']['weight']);
+    this.isItalic = ('italic' == textSymbol['font']['style']);
+  }
 
-  ngOnInit(): void { this.emitSendSymbol(); }
+  ngOnInit(): void { 
+    this.emitSendSymbol();
+  }
 
   public emitSendSymbol(): void {
     const controls = this.form.controls;
@@ -98,9 +106,10 @@ export class TextEditDialogCompComponent implements OnInit {
 
         yoffset: ( controls['size'].value * -0.5 ),
         haloSize: 1,
-        haloColor: 'rgba(0, 0, 0, 0.5)'
+        haloColor: 'rgba(0, 0, 0, 0.25)'
       };
-      this.sendSymbol.emit(textSymbol);
+      this.mapStore.setTextSymbol(textSymbol);
+      this.sendSymbol$.emit(0);
     }
   }
 }
