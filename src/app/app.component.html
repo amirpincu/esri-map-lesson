@@ -12,7 +12,7 @@
 
       <button mat-raised-button 
         color="primary"
-        (click)="searchCity()"
+        (click)="SearchCity()"
       >Add City</button>
       
     </form>
@@ -24,7 +24,7 @@
     <city-weather-card-comp class="weather-card" 
       *ngFor="let city of cities;" 
       [data]="city"
-      (placeMapClick)="showPlace($event)"
+      (placeMapClick)="ShowPlace($event)"
     >
     </city-weather-card-comp>
     
@@ -35,21 +35,4 @@
 <!-- Map -->
 <div class="map-container">
   <map-comp></map-comp>
-  <!-- Map
-  <div class="map" #mapViewNode></div>
-
-  Editor
-  <div class="editor" cdkDrag cdkDragBoundary=".map-container" *ngIf="showTextEditor">
-    The header with close button
-    <div class="header" cdkDragHandle>
-      <div class="text">
-          Text Editor
-      </div>
-      <button class="button" (click)="hideEditor()">
-          X
-      </button>
-    </div>
-    The actual editor content
-    <text-editor (sendSymbol)="updateSymbol($event)"></text-editor>
-  </div> -->
 </div>

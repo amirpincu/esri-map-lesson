@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { CityWeatherData } from 'src/app/services/city-weather.model';
+import { Coordinate } from '../../services/coordinate.model';
 
 @Component({
   selector: 'city-weather-card-comp',
@@ -8,7 +9,7 @@ import { CityWeatherData } from 'src/app/services/city-weather.model';
 })
 export class CityWeatherCardCompComponent implements OnInit, OnDestroy {
   @Input() data: CityWeatherData = { cityName: `City not specified`, temp: 0, maxTemp: 1, minTemp: -1, weatherDesc: '01d', lat: 0.000, long: 0.000 };
-  @Output() placeMapClick: EventEmitter<object> = new EventEmitter<object>();
+  @Output() placeMapClick: EventEmitter<Coordinate> = new EventEmitter<Coordinate>();
 
   public weatherImageSrc(): string {
     const url: string = `assets/weather-pics/${this.data.weatherDesc}.png`;
@@ -25,7 +26,7 @@ export class CityWeatherCardCompComponent implements OnInit, OnDestroy {
 
   }
 
-  click() {
-    this.placeMapClick.emit({ 'lat': this.data.lat, 'long': this.data.long });
+  click(): void {
+    this.placeMapClick.emit( { latitude: this.data.lat, longitude: this.data.long } );
   }
 }

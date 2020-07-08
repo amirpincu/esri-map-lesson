@@ -28,7 +28,7 @@ import { MapCompComponent } from './components/map-comp/map-comp.component';
     AppComponent,
     CityWeatherCardCompComponent,
     TextEditDialogCompComponent,
-    MapCompComponent
+    MapCompComponent,
   ],
   imports: [
     CommonModule, RouterModule,

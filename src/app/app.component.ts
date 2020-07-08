@@ -1,14 +1,15 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { WeatherServService, WeatherAPIResponseCod } from './services/weather-service/weather-serv.service';
-import { TextEditDialogCompComponent as TextEditDialogComponent } from './components/text-edit-dialog-comp/text-edit-dialog-comp.component';
 import { CityWeatherData } from './services/city-weather.model';
+import { Coordinate } from './services/coordinate.model';
 
 
 import esri = __esri;
 import { loadModules, loadScript } from 'esri-loader';
 import { EventEmitter } from '@angular/core';
 import { layer } from 'esri/views/3d/support/LayerPerformanceInfo';
+import { MapStoreServiceService } from './services/map-store-service/map-store-service.service';
 
 @Component({
   selector: 'app-root',
@@ -23,7 +24,7 @@ export class AppComponent implements OnInit, OnDestroy {
   form: FormGroup = new FormGroup({ 'city': new FormControl( '', [ Validators.required, Validators.minLength(1) ]) });
   cities: CityWeatherData[] = [];
 
-  public constructor(private weatherService: WeatherServService) { }
+  public constructor(private weatherService: WeatherServService, private mapStore: MapStoreServiceService) { }
 
   public ngOnInit() { }
 
@@ -33,9 +34,9 @@ export class AppComponent implements OnInit, OnDestroy {
   private AddCityToList( newCity: CityWeatherData ) : void {
     const existingCityIndex = this.cities.findIndex(currentCity => ( currentCity.cityName == newCity.cityName ));
     (existingCityIndex == -1) ? this.cities.push(newCity) : this.cities[existingCityIndex] = newCity;
-    this.showPlace( {'lat': newCity.lat, 'long': newCity.long} );
+    this.ShowPlace( { latitude: newCity.lat, longitude: newCity.long } );
   }
-  public searchCity(): void {
+  public SearchCity(): void {
     if (this.form.valid) {
       const cityName: string = this.form.controls['city'].value;
 
@@ -87,4 +88,5 @@ export class AppComponent implements OnInit, OnDestroy {
       );
     }
   }
+  public ShowPlace( coord: Coordinate ) { this.mapStore.setCenterSent(coord); }
 }

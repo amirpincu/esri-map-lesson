@@ -64,8 +64,9 @@ export class TextEditDialogCompComponent implements OnInit {
 
   constructor(private mapStore: MapStoreServiceService) { 
     const textSymbol = this.mapStore.getTextSymbol();
+    const text = (textSymbol['text']) ? textSymbol['text'] : 'Sample';
     this.form = new FormGroup({ 
-      'text': new FormControl( textSymbol['text'], [ Validators.required ]),
+      'text': new FormControl( text, [ Validators.required ]),
       'size': new FormControl( textSymbol['font']['size'], [ Validators.required ]),
       'font': new FormControl( textSymbol['font']['family'], [ Validators.required ]),
       'color': new FormControl( textSymbol['color'], [ Validators.required ]),
