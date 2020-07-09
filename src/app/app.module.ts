@@ -22,7 +22,6 @@ import { AppComponent } from './app.component';
 import { CityWeatherCardCompComponent } from './components/city-weather-card-comp/city-weather-card-comp.component';
 import { TextEditDialogCompComponent } from './components/text-edit-dialog-comp/text-edit-dialog-comp.component';
 import { MapCompComponent } from './components/map-comp/map-comp.component';
-import { TextShowWidget } from './components/text-show-widget/text-show-widget.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +29,6 @@ import { TextShowWidget } from './components/text-show-widget/text-show-widget.c
     CityWeatherCardCompComponent,
     TextEditDialogCompComponent,
     MapCompComponent,
-    TextShowWidget
   ],
   imports: [
     CommonModule, RouterModule,

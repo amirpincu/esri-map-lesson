@@ -9,6 +9,7 @@ import { NgElement, WithProperties } from '@angular/elements'
 import { start } from 'repl';
 import { TextShowWidget } from '../text-show-widget/text-show-widget.component';
 import { coordinateSegments } from 'esri/widgets/CoordinateConversion/support/Format';
+import { TextEditorServiceService } from 'src/app/services/text-editor-service/text-editor-service.service';
 
 declare global {
   interface HTMLElementTagNameMap {
@@ -28,7 +29,7 @@ export class MapCompComponent implements OnInit {
 
   @ViewChild('mapViewNode', {static: true} ) public mapViewEl: ElementRef;
 
-  constructor(private mapStore: MapStoreServiceService) { }
+  constructor(public mapStore: MapStoreServiceService, public textEditorService: TextEditorServiceService) { }
 
   ngOnInit(): void {
     loadModules( 
@@ -84,15 +85,21 @@ export class MapCompComponent implements OnInit {
         let coordinateConversionWidget = new CoordinateConversion( { view: mapView } );
         let distanceMeasurement2D = new DistanceMeasurement2D( { view: mapView } );
         let scaleBar = new ScaleBar( { view: mapView } );
+        // let textEditor = new TextShowWidget();
+
         mapView.ui.add( searchWidget, { position: "top-right", index: 1 } );
         mapView.ui.add( compassWidget, { position: "top-right", index: 2 } );
+        // mapView.ui.add( textEditor, { position: "top-right", index: 3 } );
         mapView.ui.add( coordinateConversionWidget, { position: "bottom-left", index: 1 });
         mapView.ui.add( distanceMeasurement2D, { position: "bottom-right", index: 1 });
         mapView.ui.add( scaleBar, { position: "top-left", index: 0 });
 
-        // Custom widgets
-        this.addTextEditWidget = this.addTextEditWidget.bind(this);
-        this.addTextEditWidget(mapView);
+        // Custom widget
+        var textWidget = this.textEditorService.getTextEditElement();
+        this.showEditor = this.showEditor.bind(this);
+        textWidget.onclick = this.showEditor;
+        mapView.ui.add(textWidget, "top-right");
+
 
         //  The graphics layer
         const p = this.mapView.center;
@@ -128,16 +135,6 @@ export class MapCompComponent implements OnInit {
     .catch( err => { console.error(err); } );
   }
 
-  // Adds custom widgets to the map view
-  private addTextEditWidget(mapView: esri.MapView) {
-
-    let textShowWidget = document.createElement("text-show-widget");
-    textShowWidget.id = "textShowWidget";
-    textShowWidget.appendChild(new TextShowWidget(this.mapStore));
-    mapView.ui.add(textShowWidget, { position: "top-right", index: 3 });
-
-  }
-
   // Activates every time a new symbol is sent.
   public updateSymbol() { 
     this.map.findLayerById('graphic-layer')['graphics'].items[0].symbol = this.mapStore.getTextSymbol();
@@ -145,10 +142,7 @@ export class MapCompComponent implements OnInit {
   
   // Both buttons the affect the text editor need to set the value to specific values so there's a need for both functions
   public showEditor() { 
-    this.showTextEditor = true;
-  }
-  public hideEditor() {
-    this.showTextEditor = false;
+    this.mapStore.setShowText(true);
   }
 
   // Start a subsription that centers the map upon coordinates being recieved
