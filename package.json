@@ -16,6 +16,7 @@
     "@angular/common": "~9.1.4",
     "@angular/compiler": "~9.1.4",
     "@angular/core": "~9.1.4",
+    "@angular/elements": "^10.0.3",
     "@angular/forms": "~9.1.4",
     "@angular/material": "^9.2.4",
     "@angular/platform-browser": "~9.1.4",

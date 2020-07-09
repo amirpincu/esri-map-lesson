@@ -5,7 +5,16 @@ import { MapStoreServiceService } from 'src/app/services/map-store-service/map-s
 import { Subscription } from 'rxjs';
 import { Coordinate } from '../../services/coordinate.model';
 import { ThrowStmt } from '@angular/compiler';
+import { NgElement, WithProperties } from '@angular/elements'
 import { start } from 'repl';
+import { TextShowWidget } from '../text-show-widget/text-show-widget.component';
+import { coordinateSegments } from 'esri/widgets/CoordinateConversion/support/Format';
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'text-show-widget': NgElement & WithProperties<{}>;
+  }
+}
 
 @Component({
   selector: 'map-comp',
@@ -45,7 +54,7 @@ export class MapCompComponent implements OnInit {
         Graphic, Point,
         Search, Compass, CoordinateConversion, DistanceMeasurement2D, ScaleBar
       ] ) => {
-        
+
         //    MAP
         let map = new EsriMap({
           basemap: 'hybrid'
@@ -59,7 +68,6 @@ export class MapCompComponent implements OnInit {
           zoom: 7,
           map: map
         }); 
-        this.mapStore.setView( mapView );
         this.mapView = mapView;
 
         //    UPDATING THE HOVER COORDINATES
@@ -82,6 +90,10 @@ export class MapCompComponent implements OnInit {
         mapView.ui.add( distanceMeasurement2D, { position: "bottom-right", index: 1 });
         mapView.ui.add( scaleBar, { position: "top-left", index: 0 });
 
+        // Custom widgets
+        this.addTextEditWidget = this.addTextEditWidget.bind(this);
+        this.addTextEditWidget(mapView);
+
         //  The graphics layer
         const p = this.mapView.center;
         let symbol = this.mapStore.getTextSymbol();
@@ -93,7 +105,7 @@ export class MapCompComponent implements OnInit {
         map.add(gl);
 
         //  On click function
-        let f = function(obj) {
+        let onMapClick = function(obj) {
           if (this.showTextEditor) { // Only if the editor is on screen
             //  Creating the new graphic
             const currCoord = this.mapStore.getCurrentCoordinates();
@@ -108,26 +120,41 @@ export class MapCompComponent implements OnInit {
             graphics.add(g);
           }
         };
-        f = f.bind(this);
-        this.mapView.on("click", f );
+        onMapClick = onMapClick.bind(this);
+        this.mapView.on("click", onMapClick );
 
         this.showPlaceSubscription();
     })
-    .catch( err => {
-      console.error(err);
-    });
+    .catch( err => { console.error(err); } );
   }
 
-    // Activates every time a new symbol is sent.
-    public updateSymbol() {
-      this.map.findLayerById('graphic-layer')['graphics'].items[0].symbol = this.mapStore.getTextSymbol();
-    }
-  
-    // Both buttons the affect the text editor need to set the value to specific values so there's a need for both functions
-    public showEditor() { this.showTextEditor = true; }
-    public hideEditor() { this.showTextEditor = false; }
+  // Adds custom widgets to the map view
+  private addTextEditWidget(mapView: esri.MapView) {
 
-    public showPlaceSubscription(): void {
+    let textShowWidget = document.createElement("div");
+    textShowWidget.id = "textShowWidget";
+    // textShowWidget.className = "esri-widget esri-component";
+    // textShowWidget.innerHTML = "<text-show-widget></text-show-widget>";
+    textShowWidget.appendChild(new TextShowWidget(this.mapStore));
+    mapView.ui.add(textShowWidget, { position: "top-right", index: 3 });
+
+  }
+
+  // Activates every time a new symbol is sent.
+  public updateSymbol() { 
+    this.map.findLayerById('graphic-layer')['graphics'].items[0].symbol = this.mapStore.getTextSymbol();
+  }
+  
+  // Both buttons the affect the text editor need to set the value to specific values so there's a need for both functions
+  public showEditor() { 
+    this.showTextEditor = true;
+  }
+  public hideEditor() {
+    this.showTextEditor = false;
+  }
+
+  // Start a subsription that centers the map upon coordinates being recieved
+  public showPlaceSubscription(): void {
       this.mapStore.onCenterSent().subscribe(
         (coord) => {
           this.mapView.goTo([ coord.longitude, coord.latitude ])
@@ -136,6 +163,6 @@ export class MapCompComponent implements OnInit {
           console.error(err);
         }
       );
-    }
+  }
 
 }

@@ -1,15 +1,16 @@
 <div class="comp-container">
     <!-- Map -->
-    <div class="map" #mapViewNode></div>
+    <div class="map" #mapViewNode>
+    </div>
 
     <!-- Editor -->
-    <div class="editor" cdkDrag cdkDragBoundary=".map-container" *ngIf="showTextEditor">
+    <div class="editor" cdkDrag cdkDragBoundary=".map-container" *ngIf="mapStore.getShowText()">
         <!-- The header with close button -->
         <div class="header" cdkDragHandle>
         <div class="text">
             Text Editor
         </div>
-        <button class="button" (click)="hideEditor()">
+        <button class="button" (click)="mapStore.setShowText(false)">
             X
         </button>
         </div>
