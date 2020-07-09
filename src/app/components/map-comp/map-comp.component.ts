@@ -131,10 +131,8 @@ export class MapCompComponent implements OnInit {
   // Adds custom widgets to the map view
   private addTextEditWidget(mapView: esri.MapView) {
 
-    let textShowWidget = document.createElement("div");
+    let textShowWidget = document.createElement("text-show-widget");
     textShowWidget.id = "textShowWidget";
-    // textShowWidget.className = "esri-widget esri-component";
-    // textShowWidget.innerHTML = "<text-show-widget></text-show-widget>";
     textShowWidget.appendChild(new TextShowWidget(this.mapStore));
     mapView.ui.add(textShowWidget, { position: "top-right", index: 3 });
 
