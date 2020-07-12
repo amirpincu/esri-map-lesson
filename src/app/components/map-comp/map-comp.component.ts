@@ -7,7 +7,6 @@ import { Coordinate } from '../../services/coordinate.model';
 import { ThrowStmt } from '@angular/compiler';
 import { NgElement, WithProperties } from '@angular/elements'
 import { start } from 'repl';
-import { TextShowWidget } from '../text-show-widget/text-show-widget.component';
 import { coordinateSegments } from 'esri/widgets/CoordinateConversion/support/Format';
 import { TextEditorServiceService } from 'src/app/services/text-editor-service/text-editor-service.service';
 
