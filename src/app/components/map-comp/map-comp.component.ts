@@ -10,12 +10,6 @@ import { start } from 'repl';
 import { coordinateSegments } from 'esri/widgets/CoordinateConversion/support/Format';
 import { TextEditorServiceService } from 'src/app/services/text-editor-service/text-editor-service.service';
 
-declare global {
-  interface HTMLElementTagNameMap {
-    'text-show-widget': NgElement & WithProperties<{}>;
-  }
-}
-
 @Component({
   selector: 'map-comp',
   templateUrl: './map-comp.component.html',
@@ -24,7 +18,6 @@ declare global {
 export class MapCompComponent implements OnInit {
   // VARIABLES REALATED TO THE MAP
   map: esri.Map; mapView: esri.MapView;
-  showTextEditor = false; // the variable deciding if the text editor shows.
 
   @ViewChild('mapViewNode', {static: true} ) public mapViewEl: ElementRef;
 
@@ -112,7 +105,7 @@ export class MapCompComponent implements OnInit {
 
         //  On click function
         let onMapClick = function(obj) {
-          if (this.showTextEditor) { // Only if the editor is on screen
+          if (this.mapStore.getShowText()) { // Only if the editor is on screen
             //  Creating the new graphic
             const currCoord = this.mapStore.getCurrentCoordinates();
             const g = new Graphic({ 
